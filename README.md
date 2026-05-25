@@ -4,281 +4,337 @@
 > 
 > 在现实世界中，**The Seed** 是一个面向大众的下一代 AI Agent 开发框架——它继承 OpenClaw Hermes 的核心理念，超越其边界，让每个人都能构建属于自己的 AI Agent。
 
+> ⚡️ **核心理念**：可观测、可拆分溯源、可控、可续执行、能定制、能汇报的 Agent 系统。
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
-[![Chat](https://img.shields.io/badge/Chat-Community-blue.svg)](https://github.com/Kirrito-k423/TheSeed/discussions)
 
 ---
 
 ## 🎯 Core Philosophy / 核心哲学
 
-The Seed 的设计理念源自 SAO 中的「创世」概念：
+### 降本 & 增效的双轮驱动
 
-1. **The Seed 不只是一个框架，而是一个生态系统**
-   - 每个人都可以用 The Seed 构建、发布和分享自己的 Agent
-   - 开发者不需要深入理解底层原理，也能创建强大的 AI Agent
+| 维度 | 策略 | 说明 |
+|------|------|------|
+| **降本（Cost Reduction）** | 克制的上下文输入 | 只给少量信息，反馈不足则动态补充更多 |
+| **降本** | 可定制压缩策略 | 多级压缩：摘要/检索/丢弃，用户可配置 |
+| **增效（Efficiency）** | 子任务原子化拆分 | 追求最小可执行单元，场景可定制拆分策略 |
+| **增效** | 智能调度 | 子任务并行/串行，优先级调度 |
+| **增效** | 提示词优化 | 自适应提示词，根据任务类型选择最佳模板 |
 
-2. **超越 OpenClaw Hermes**
-   - Hermes 是强大的面向开发者的框架
-   - The Seed 在其基础上，增加了面向终端用户的**零代码配置能力**
-   - 更大胆的多模型协作、更灵活的工具系统、更开放的生态
+### 生产级可靠性
 
-3. **Universal LLM API Support / 通用 LLM API 支持**
-   - 内置支持 50+ LLM 提供商
-   - OpenAI / Anthropic / Google / Azure / 本地模型 / 国产模型（文心/通义/混元/等）
-   - 统一接口，一次配置，处处运行
+| 特性 | 说明 |
+|------|------|
+| **可观测（Observable）** | 每个技能触发、上下文膨胀、token 吞吐全程记录 |
+| **可拆分溯源（Traceable）** | 子任务拆分原因可追溯，拆分地图（map）清晰可见 |
+| **可控（Controllable）** | 压缩策略、拆分策略、工具选择均可配置 |
+| **可续执行（Resumable）** | 细粒度暂停/续训，中间文件详细到支持任意位置恢复 |
+| **可定制（Customizable）** | LLM API、工具、压缩策略、拆分策略全部可插拔 |
+| **可汇报（Reportable）** | 详尽的 DFX 数据：耗时、费用、瓶颈分析全链路可视化 |
 
 ---
 
 ## 🏗️ Architecture / 架构设计
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    The Seed Framework                    │
-├─────────────────────────────────────────────────────────┤
-│                                                          │
-│  ┌──────────┐   ┌──────────┐   ┌──────────────────┐     │
-│  │  User    │   │ Developer│   │   Plugin Author  │     │
-│  │ (Zero    │   │ (Custom  │   │   (Extension    │     │
-│  │  Code)   │   │  Logic)  │   │    Builder)     │     │
-│  └────┬─────┘   └────┬─────┘   └───────┬──────────┘     │
-│       │              │                  │                 │
-│  ┌────▼───────────────▼─────────────────▼──────────┐    │
-│  │           The Seed Core Engine                   │    │
-│  │  ┌─────────────────────────────────────────┐     │    │
-│  │  │     Agent Orchestration Layer           │     │    │
-│  │  │  ┌─────────┐  ┌─────────┐  ┌────────┐  │     │    │
-│  │  │  │ Memory  │  │  Tools  │  │  LLM   │  │     │    │
-│  │  │  │ Engine  │  │ Registry│  │ Bridge │  │     │    │
-│  │  │  └─────────┘  └─────────┘  └────────┘  │     │    │
-│  │  └─────────────────────────────────────────┘     │    │
-│  │  ┌─────────────────────────────────────────┐     │    │
-│  │  │   Platform Integration Layer             │     │    │
-│  │  │  Telegram | Discord | WeChat | API | ... │     │    │
-│  │  └─────────────────────────────────────────┘     │    │
-│  └──────────────────────────────────────────────────┘    │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         The Seed Framework                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐  │
+│  │    User      │  │  Developer   │  │      Enterprise Admin         │  │
+│  │ (Zero Code)  │  │ (Customize)  │  │   (Policy Configuration)      │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────────────┬───────────────┘  │
+│         │                 │                           │                  │
+│  ┌──────▼─────────────────▼───────────────────────────▼────────────┐  │
+│  │                     Configuration Layer                              │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐  ┌───────────┐ │  │
+│  │  │Compression │  │  Decompose  │  │   Tool       │  │    LLM    │ │  │
+│  │  │  Policy    │  │  Strategy  │  │  Policy     │  │  Policy   │ │  │
+│  │  └─────────────┘  └─────────────┘  └──────────────┘  └───────────┘ │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                                  │                                        │
+│  ┌───────────────────────────────▼──────────────────────────────────┐  │
+│  │                      Core Engine                                     │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐    │  │
+│  │  │                    Agent Orchestrator                         │    │  │
+│  │  │  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐  │    │  │
+│  │  │  │ Context  │  │  Task     │  │  Tool    │  │   LLM     │  │    │  │
+│  │  │  │ Manager  │  │ Splitter  │  │ Executor │  │  Bridge   │  │    │  │
+│  │  │  │ (压缩)    │  │ (原子化)  │  │ (可拓展)  │  │ (通用)    │  │    │  │
+│  │  │  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  │    │  │
+│  │  └────────┼─────────────┼─────────────┼───────────────┼────────┘    │  │
+│  │           │            │            │            │                  │  │
+│  │  ┌─────────▼───────────▼────────────▼────────────▼────────────┐   │  │
+│  │  │                    Memory & State                            │   │  │
+│  │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────────────┐ │   │  │
+│  │  │  │ Short   │  │  Long   │  │ Check-  │  │  Intermediate   │ │   │  │
+│  │  │  │ Term    │  │  Term   │  │ point   │  │    Files        │ │   │  │
+│  │  │  │ Memory  │  │ Memory  │  │         │  │  (续训支持)      │ │   │  │
+│  │  │  └─────────┘  └─────────┘  └─────────┘  └─────────────────┘ │   │  │
+│  │  └───────────────────────────────────────────────────────────────┘   │  │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                  │                                        │
+│  ┌───────────────────────────────▼──────────────────────────────────┐  │
+│  │                    Observability Layer                             │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐ │  │
+│  │  │   Metrics   │  │   Traces     │  │   Reports & Dashboards   │ │  │
+│  │  │ 耗时/吞吐/ │  │ 链路追踪/  │  │ 可视化/瓶颈分析/        │ │  │
+│  │  │ 费用/延迟  │  │ 拆分溯源   │  │ E2E耗时占比             │ │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────────────────┘ │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    Platform Integration Layer                      │   │
+│  │  Telegram | Discord | WeChat | API Server | Custom Webhook        │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
-
-### Core Components / 核心组件
-
-| Component | Description |
-|-----------|-------------|
-| **TheSeed.Core** | 核心引擎，处理 Agent 的生命周期管理 |
-| **TheSeed.Memory** | 记忆系统，支持短期/长期记忆，跨会话上下文 |
-| **TheSeed.Tools** | 工具注册表，动态加载和执行工具 |
-| **TheSeed.LLM** | LLM 桥接层，统一接口连接各种模型提供商 |
-| **TheSeed.Platform** | 平台集成，支持多端消息网关 |
-| **TheSeed.Plugin** | 插件系统，热插拔扩展功能 |
-| **TheSeed.Config** | 配置系统，支持 YAML/JSON/ENV 多格式 |
-| **TheSeed.UI** | 用户界面，CLI / Web / Desktop 三端可选 |
 
 ---
 
-## ✨ Features / 核心特性
+## 🔬 Core Modules / 核心模块
 
-### 🚀 Getting Started / 快速上手
+### 1. Context Manager（上下文管理器）
+
+**职责**：克制的上下文输入 + 可定制压缩策略
+
+```
+输入信息 ──→ [少给原则] ──→ [反馈不足?] ──→ [动态补充更多]
+                                    │
+                          ┌─────────▼─────────┐
+                          │  压缩策略选择器    │
+                          │  - Summary (摘要)   │
+                          │  - Retrieval (检索) │
+                          │  - Drop (丢弃)      │
+                          │  - Keep (保留)      │
+                          └─────────────────────┘
+```
+
+### 2. Task Splitter（任务拆分器）
+
+**职责**：极致简单的子任务拆分，追求原子化
+
+| 策略 | 适用场景 |
+|------|----------|
+| `atomic` | 通用场景，每个动作一个子任务 |
+| `scene-aware` | 业务场景，保留领域知识边界 |
+| `streaming` | 流式场景，支持增量处理 |
+| `rollback` | 关键决策场景，保留回滚点 |
+
+**拆分输出**：
+```json
+{
+  "task_id": "t001",
+  "decomposition_reason": "用户问题涉及多步骤，需要拆分以确保可追溯",
+  "subtasks": [
+    {
+      "id": "s001",
+      "action": "search_web",
+      "input": "最新AI Agent框架对比",
+      "output_file": ".seed/checkpoint/s001.json"
+    },
+    {
+      "id": "s002", 
+      "action": "analyze",
+      "depends_on": ["s001"],
+      "input_file": ".seed/checkpoint/s001.json",
+      "output_file": ".seed/checkpoint/s002.json"
+    }
+  ]
+}
+```
+
+### 3. Tool Executor（工具执行器）
+
+**职责**：易拓展的工具接口，支持网络搜索、文本处理、命令行执行
+
+```python
+@register_tool(name="web_search", description="网络搜索")
+def web_search(query: str, max_results: int = 5) -> str:
+    """支持多种搜索后端：SerpAPI/Tavily/Bing/Google"""
+    ...
+
+@register_tool(name="cli_execute", description="命令行执行")
+def cli_execute(command: str, timeout: int = 30) -> str:
+    """安全执行本地命令，超时保护"""
+    ...
+
+@register_tool(name="text_process", description="文本处理")
+def text_process(text: str, operation: str) -> str:
+    """文本分析、摘要、翻译等操作"""
+    ...
+```
+
+### 4. LLM Bridge（LLM 桥接层）
+
+**职责**：统一接口，连接各种 LLM 提供商
+
+```python
+# 支持的提供商
+providers = [
+    "openai",      # GPT-4o / GPT-4o-mini
+    "anthropic",   # Claude 3.5 / Claude 3 Opus
+    "google",      # Gemini 2.0 / Gemini Flash
+    "qwen",        # 通义千问
+    "wenxin",      # 文心一言
+    "混元",        # 腾讯混元
+    "local",       # vLLM / Ollama / LocalAI
+    "custom",      # 自定义端点
+]
+```
+
+---
+
+## 📊 Observability / 可观测性
+
+### 详尽的 DFX 数据
+
+| 指标类别 | 具体指标 | 说明 |
+|----------|----------|------|
+| **Skills 触发** | 触发时刻、上下文膨胀率 | 记录每个 skill 何时被触发，输入输出大小 |
+| **Token 吞吐** | 输入/输出 token 数、首 token 延迟、总费用 | 按子任务/工具/全链路统计 |
+| **工具调用** | 调用次数、成功率、耗时、错误类型 | 每个工具的独立 metrics |
+| **E2E 分析** | 总耗时、瓶颈占比、拆分 map 图 | 端到端任务追踪和瓶颈定位 |
+| **子任务溯源** | 拆分原因、子任务依赖图、中间文件 | 任意位置可恢复 |
+
+### 报告示例
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  The Seed - 任务执行报告                                    │
+├─────────────────────────────────────────────────────────────┤
+│  任务ID: task_20250601_001                                   │
+│  开始时间: 2026-06-01 10:00:00                               │
+│  总耗时: 45.2s                                               │
+├─────────────────────────────────────────────────────────────┤
+│  拆分原因: 用户问题涉及多步骤网络搜索+分析，原子化拆分        │
+│  子任务数: 4                                                  │
+├─────────────────────────────────────────────────────────────┤
+│  子任务   │ 耗时   │ Token  │ 费用    │ 状态                │
+│  ──────── │ ─────  │ ─────  │ ──────  │ ─────────────────── │
+│  s001 搜索│ 12.3s  │ 1,200  │ $0.002  │ ✅ 完成              │
+│  s002 分析│ 8.7s   │ 3,400  │ $0.014  │ ✅ 完成              │
+│  s003 汇总│ 5.1s   │ 800    │ $0.003  │ ✅ 完成              │
+├─────────────────────────────────────────────────────────────┤
+│  工具调用 │ 次数   │ 成功率 │ 耗时均  │                     │
+│  ──────── │ ─────  │ ─────  │ ─────   │                     │
+│  web_search│ 2     │ 100%   │ 5.2s    │                     │
+├─────────────────────────────────────────────────────────────┤
+│  瓶颈分析: s002 分析阶段占总耗时 19.2%，为主要瓶颈           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start / 快速开始
 
 ```bash
 # 安装
 pip install the-seed
 
-# 初始化项目
-seed init my-agent
+# 初始化
+seed init my-agent --scenario e-commerce
 
-# 配置模型
+# 配置
 seed config set llm.provider openai
-seed config set llm.api_key sk-xxxx
+seed config set llm.model gpt-4o
+seed config set llm.api_key ${OPENAI_API_KEY}
 
-# 启动 Agent
-seed run
+# 启用可观测性
+seed config set observability.enabled true
+seed config set observability.export_format html
+
+# 运行
+seed run --task "分析竞品价格并给出建议"
 ```
 
-### 🔧 Configuration / 配置示例
+---
+
+## ⚙️ Configuration / 配置示例
 
 ```yaml
 # seed.yaml
 agent:
-  name: "MyFirstAgent"
-  personality: "helpful"
+  name: "MyAgent"
+  scenario: custom  # e-commerce / customer-service / data-analysis / custom
   model: gpt-4o
 
 llm:
-  provider: openai  # or anthropic/google/azure/local/...
+  provider: openai
   api_key: ${OPENAI_API_KEY}
-  # 支持多模型热切换
+  # 多模型热切换
   models:
     primary: gpt-4o
-    fallback: gpt-4o-mini
+    analysis: gpt-4o-mini
+    fallback: claude-sonnet-4
 
-memory:
-  type: sqlite  # or redis/mem0
-  session_store: ~/.the-seed/memory.db
+# 压缩策略
+compression:
+  strategy: adaptive  # none / summary / retrieval / adaptive
+  max_context_tokens: 128000
+  trigger_threshold: 0.7  # 上下文利用率 > 70% 时触发压缩
 
+# 拆分策略
+decompose:
+  strategy: atomic  # atomic / scene-aware / streaming / rollback
+  max_subtasks: 20
+  parallel_threshold: 3  # 超过3个子任务时尝试并行
+
+# 工具配置
 tools:
   enabled:
     - web_search
-    - calculator
-    - file_operations
-  custom:
-    - ./my-tools/
+    - cli_execute
+    - text_process
+  custom_path: ./my-tools/
 
+# 可观测性
+observability:
+  enabled: true
+  export:
+    - format: json
+      path: .seed/reports/
+    - format: html
+      path: .seed/reports/
+  metrics:
+    - token_usage
+    - latency
+    - cost
+    - error_rate
+
+# 平台配置
 platforms:
-  telegram:
+  api:
     enabled: true
-    bot_token: ${TELEGRAM_BOT_TOKEN}
-```
-
-### 🌐 Universal LLM Support / 通用 LLM 支持
-
-```python
-from seed import TheSeed
-
-# OpenAI
-agent = TheSeed(provider="openai", model="gpt-4o")
-
-# Anthropic
-agent = TheSeed(provider="anthropic", model="claude-sonnet-4")
-
-# Google
-agent = TheSeed(provider="google", model="gemini-2-flash")
-
-# Azure
-agent = TheSeed(provider="azure", endpoint="https://xxx.openai.azure.com")
-
-# 本地模型 / 国产模型
-agent = TheSeed(provider="local", model="Qwen/Qwen2.5-72B-Instruct")
-agent = TheSeed(provider="qwen", model="qwen-turbo")
-agent = TheSeed(provider="wenxin", model="ernie-4.0")
-
-# 自定义 API 端点
-agent = TheSeed(
-    provider="custom",
-    api_base="https://your-custom-endpoint.com/v1",
-    api_key="sk-xxxx"
-)
-```
-
-### 🛠️ Tool System / 工具系统
-
-```python
-from seed.tools import register_tool
-
-@register_tool(name="weather", description="查询天气")
-def get_weather(city: str) -> str:
-    """获取指定城市的天气信息"""
-    return f"{city} 今天的天气是晴天，25°C"
-
-# 工具自动被发现并注册
-agent = TheSeed()
-agent.register_tool(get_weather)
-```
-
-### 💬 Multi-Platform / 多平台支持
-
-```bash
-# Telegram Bot
-seed platform enable telegram --token xxx
-
-# Discord Bot  
-seed platform enable discord --token xxx
-
-# WeChat (企业版)
-seed platform enable wechat --corpid xxx --corpsecret xxx
-
-# 自定义 API Server
-seed platform enable api --port 8080
+    port: 8080
 ```
 
 ---
 
-## 📁 Project Structure / 项目结构
-
-```
-TheSeed/
-├── src/
-│   └── seed/
-│       ├── __init__.py
-│       ├── core/                 # 核心引擎
-│       │   ├── agent.py          # Agent 主类
-│       │   ├── engine.py         # 推理引擎
-│       │   └── loop.py          # Agent Loop
-│       ├── llm/                  # LLM 桥接
-│       │   ├── base.py          # 抽象基类
-│       │   ├── openai.py        # OpenAI 适配器
-│       │   ├── anthropic.py     # Anthropic 适配器
-│       │   └── custom.py        # 自定义适配器
-│       ├── memory/              # 记忆系统
-│       │   ├── base.py
-│       │   ├── short_term.py
-│       │   └── long_term.py
-│       ├── tools/               # 工具系统
-│       │   ├── registry.py
-│       │   ├── executor.py
-│       │   └── builtins/        # 内置工具
-│       ├── platform/            # 平台集成
-│       │   ├── base.py
-│       │   ├── telegram.py
-│       │   ├── discord.py
-│       │   └── api.py
-│       ├── plugin/             # 插件系统
-│       │   ├── loader.py
-│       │   └── manager.py
-│       ├── config/             # 配置系统
-│       │   ├── loader.py
-│       │   └── validator.py
-│       └── ui/                 # 用户界面
-│           ├── cli.py
-│           └── web.py
-├── tests/
-├── docs/
-├── examples/
-├── pyproject.toml
-└── README.md
-```
-
----
-
-## 🔥 Comparison with Hermes / 与 Hermes 对比
+## 🔥 Comparison / 与 Hermes 对比
 
 | Feature | OpenClaw Hermes | The Seed |
 |---------|-----------------|----------|
 | **目标用户** | 开发者 | 所有用户 + 开发者 |
 | **配置方式** | YAML + 代码 | YAML / JSON / ENV / Web UI |
 | **零代码模式** | ❌ | ✅ |
-| **多模型支持** | ✅ | ✅ (更广) |
-| **工具注册** | 代码级 | 代码 + YAML + 热插拔 |
-| **记忆系统** | SQLite | SQLite + Redis + 云端 |
-| **平台集成** | 多平台 | 多平台 + 微信小程序 |
-| **插件系统** | 基础 | 完整的热插拔生态 |
-| **多Agent协作** | 基础 | 原生支持 |
-| **学习曲线** | 中高 | 低~中 |
+| **上下文压缩** | 基础 | 可定制多级压缩策略 |
+| **任务拆分** | 基础 | 原子化 + 场景定制 |
+| **细粒度续训** | ❌ | ✅ Checkpoint 中间文件 |
+| **可观测性** | 基础日志 | DFX 全链路 metrics + 报告 |
+| **多模型支持** | ✅ | ✅ (更广+热切换) |
+| **工具系统** | 代码级 | 代码 + YAML + 热插拔 |
+| **E2E 报告** | 基础 | 详尽瓶颈分析 + 可视化 |
 
 ---
 
-## 🚧 Roadmap / 路线图
+## 📜 License
 
-- [ ] **v0.1.0** - 核心框架搭建完成
-- [ ] **v0.2.0** - LLM 适配器支持 OpenAI/Anthropic/本地模型
-- [ ] **v0.3.0** - 基础工具系统和记忆系统
-- [ ] **v0.4.0** - Telegram/Discord 平台集成
-- [ ] **v0.5.0** - 零代码配置模式
-- [ ] **v1.0.0** - 正式版发布
-
----
-
-## 📜 License / 许可证
-
-MIT License - 允许任何人免费使用、修改和分发。
-
----
-
-## 🙏 Credits / 致谢
-
-- 灵感来源：[Sword Art Online - The Seed](https://swordartonline.fandom.com/wiki/The_Seed)
-- 技术参考：[OpenClaw Hermes](https://github.com/nickat坠机/hermes-agent)
-- 图标：[Emoji](https://github.com/ikatyang/emoji-cheat-sheet)
+MIT License
 
 ---
 
